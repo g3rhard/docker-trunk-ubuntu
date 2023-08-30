@@ -1,6 +1,6 @@
 FROM alpine:edge
 
-RUN apk update && apk add curl bash git libc6-compat
+RUN apk update && apk add curl bash git build-base gcompat
 
 RUN curl https://get.trunk.io -fsSL | bash -s -- -y
 
