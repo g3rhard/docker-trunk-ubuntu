@@ -1,6 +1,7 @@
-FROM alpine:edge
+FROM ubuntu:jammy-20230804
 
-RUN apk update && apk add curl bash git build-base gcompat libstdc++
+RUN apt update && apt-get install -yqq \
+      curl bash git
 
 RUN curl https://get.trunk.io -fsSL | bash -s -- -y
 
