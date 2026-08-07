@@ -12,10 +12,10 @@ FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:a5da6f6b18c3a4b8dcc73244592f70
 
   RUN curl --fail --show-error --silent --location \
         --proto '=https' --tlsv1.2 \
-      https://trunk.io/releases/trunk \
-      --output /tmp/trunk-installer && \
-    chmod 0755 /tmp/trunk-installer && \
-    /tmp/trunk-installer --version
+        https://trunk.io/releases/trunk \
+        --output /tmp/trunk-installer && \
+      chmod 0755 /tmp/trunk-installer && \
+      /tmp/trunk-installer --version
 
 FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:a5da6f6b18c3a4b8dcc73244592f7096f417d2667966d0e33460e9e308f25f67
 
