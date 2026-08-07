@@ -8,6 +8,9 @@ on:
     paths:
       - Dockerfile
       - .dockerignore
+  schedule:
+    - cron: 0 2 * * *
+      timezone: Europe/Warsaw
   workflow_dispatch: {}
 
 permissions:
@@ -54,6 +57,8 @@ jobs:
         with:
           context: .
           push: true
+          # Nightly builds must refresh Ubuntu packages and the Trunk CLI.
+          no-cache: ${{ github.event_name == 'schedule' }}
           tags: ${{ github.repository }}:${{ env.DATE }}-${{ github.ref_name }}
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
