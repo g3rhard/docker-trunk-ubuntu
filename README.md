@@ -8,7 +8,11 @@
 ## Usage example
 
 ```sh
-docker run --rm -v $(pwd):/code g3rhard/docker-trunk-ubuntu trunk check /code
+docker run --rm \
+  --volume "$(pwd):/workspace" \
+  --workdir /workspace \
+  g3rhard/docker-trunk-ubuntu trunk check
 ```
 
-This command runs trunk.io checks on the code in your current directory using the Docker image.
+The container runs as an unprivileged user. This command mounts the current repository and runs
+Trunk checks without granting the container root privileges.
