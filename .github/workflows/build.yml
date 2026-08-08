@@ -44,8 +44,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      date: ${{ steps.build-date.outputs.date }}
 
     steps:
       - name: Checkout code
@@ -73,11 +71,9 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get current date
-        id: build-date
         run: |
           date="$(date --utc +'%Y.%m.%d')"
           echo "DATE=${date}" >> "$GITHUB_ENV"
-          echo "date=${date}" >> "$GITHUB_OUTPUT"
 
       - name: Build and push
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
@@ -98,7 +94,7 @@ jobs:
           sbom: true
 
   release:
-    needs: build
+    needs: promote
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -107,22 +103,23 @@ jobs:
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_DATE: ${{ needs.build.outputs.date }}
         run: |
-          tag="${RELEASE_DATE}-${GITHUB_SHA::12}"
+          release_date="$(date --utc +'%Y.%m.%d')"
+          tag="production-${release_date}-${GITHUB_SHA::12}"
           gh release create "$tag" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "Release ${RELEASE_DATE}" \
+            --title "Production release ${release_date}" \
             --generate-notes
 
   cleanup:
     if: >-
       always() &&
-      ((github.event_name == 'schedule' && needs.release.result == 'success') ||
+      ((github.event_name == 'schedule' && github.event.schedule == '0 2 * * *' &&
+      needs.build.result == 'success') ||
       (github.event_name == 'workflow_dispatch' &&
       (inputs.operation == 'cleanup' || inputs.operation == 'cleanup-dry-run')))
-    needs: [build, release]
+    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions: {}
@@ -182,7 +179,7 @@ jobs:
       always() &&
       ((github.event_name == 'schedule' && github.event.schedule == '0 3 1 * *') ||
       (github.event_name == 'workflow_dispatch' && inputs.operation == 'promote'))
-    needs: [build, release]
+    needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
@@ -229,4 +226,4 @@ jobs:
         with:
           title: "Run ${{ github.workflow }} on ${{ github.repository }}"
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          status: ${{ ((github.event_name == 'workflow_dispatch' && (inputs.operation == 'cleanup' || inputs.operation == 'cleanup-dry-run') && needs.cleanup.result == 'success') || (((github.event_name == 'workflow_dispatch' && inputs.operation == 'promote') || (github.event_name == 'schedule' && github.event.schedule == '0 3 1 * *')) && needs.promote.result == 'success') || (needs.build.result == 'success' && needs.release.result == 'success' && (needs.cleanup.result == 'success' || needs.cleanup.result == 'skipped') && needs.promote.result == 'skipped')) && 'success' || 'failure' }}
+          status: ${{ ((github.event_name == 'workflow_dispatch' && (inputs.operation == 'cleanup' || inputs.operation == 'cleanup-dry-run') && needs.cleanup.result == 'success') || (((github.event_name == 'workflow_dispatch' && inputs.operation == 'promote') || (github.event_name == 'schedule' && github.event.schedule == '0 3 1 * *')) && needs.promote.result == 'success' && needs.release.result == 'success') || (needs.build.result == 'success' && needs.release.result == 'skipped' && (needs.cleanup.result == 'success' || needs.cleanup.result == 'skipped') && needs.promote.result == 'skipped')) && 'success' || 'failure' }}
