@@ -9,7 +9,7 @@ on:
       - Dockerfile
       - .dockerignore
   schedule:
-    - cron: 0 2 * * *
+    - cron: 0 2 * * 6
       timezone: Europe/Warsaw
     - cron: 0 3 1 * *
       timezone: Europe/Warsaw
@@ -37,7 +37,7 @@ jobs:
   build:
     if: >-
       github.event_name == 'push' ||
-      (github.event_name == 'schedule' && github.event.schedule == '0 2 * * *') ||
+      (github.event_name == 'schedule' && github.event.schedule == '0 2 * * 6') ||
       (github.event_name == 'workflow_dispatch' && inputs.operation == 'build')
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -115,7 +115,7 @@ jobs:
   cleanup:
     if: >-
       always() &&
-      ((github.event_name == 'schedule' && github.event.schedule == '0 2 * * *' &&
+      ((github.event_name == 'schedule' && github.event.schedule == '0 2 * * 6' &&
       needs.build.result == 'success') ||
       (github.event_name == 'workflow_dispatch' &&
       (inputs.operation == 'cleanup' || inputs.operation == 'cleanup-dry-run')))
