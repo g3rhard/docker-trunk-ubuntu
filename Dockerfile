@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1@sha256:87999aa3d42bdc6bea60565083ee17e86d1f3339802f543c0d03998580f9cb89
-FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:b994b083afbc80cb1a4c5a89f8103538d7e1ee046b63bb852018d191f54b10c3 AS trunk-installer
+FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:cd11a24d38f395f018457869ea3dab0c21546450787e63d60b52e680de159bb7 AS trunk-installer
 
   ENV DEBIAN_FRONTEND=noninteractive
 
@@ -17,7 +17,7 @@ FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:b994b083afbc80cb1a4c5a89f81035
       chmod 0755 /tmp/trunk-installer && \
       /tmp/trunk-installer --version
 
-FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:b994b083afbc80cb1a4c5a89f8103538d7e1ee046b63bb852018d191f54b10c3
+FROM public.ecr.aws/ubuntu/ubuntu:resolute@sha256:cd11a24d38f395f018457869ea3dab0c21546450787e63d60b52e680de159bb7
 
 LABEL org.opencontainers.image.title="Trunk CLI on Ubuntu" \
       org.opencontainers.image.description="Containerized Trunk CLI tooling" \
